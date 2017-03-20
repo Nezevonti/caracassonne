@@ -18,12 +18,76 @@ typedef struct Tile{
     bool isTemplePresent;
 }Tile;
 
+bool check_validity(struct Tile map[SIZE][SIZE],struct Tile new_Tile,short int y, short int x){ //re-written
+
+
+
+    //checking up
+    if(y>0){
+            if(map[y-1][x].south==new_Tile.north || map[y-1][x].south==empty){
+
+            }
+            else{
+                return false;
+            }
+    }
+    else{
+
+            return false;
+    }
+
+    //check right
+    if((x+1)<SIZE){
+        if(map[y][x+1].west==new_Tile.east || map[y][x+1].west==empty){
+
+        }
+        else{
+            return false;
+        }
+    }
+    else{
+
+         return false;
+    }
+
+    //check left
+    if(x>0){
+        if(map[y][x-1].east==new_Tile.west || map[y][x-1].east==empty){
+
+        }
+        else{
+            return false;
+        }
+    }
+    else{
+
+            return false;
+    }
+
+    //check down
+    if((y+1)<SIZE){
+            if(map[y+1][x].north==new_Tile.south || map[y+1][x].north==empty){
+
+            }
+            else{
+                return false;
+            }
+    }
+    else{
+
+        return false;
+    }
+
+}
+
+/*
 bool check_validity(struct Tile map[SIZE][SIZE],struct Tile new_Tile,short int x, short int y){
 
     bool return_value = true;
     //check up
-    if((y+1)<SIZE){
-        if(map[x][y+1].south==new_Tile.north || map[x][y+1].south==empty) printf("up ok\n");
+    printf("%d %d \n",x,y);
+    if((y-1)<SIZE){
+        if(map[x][y-1].south==new_Tile.north || map[x][y-1].south==empty) printf("up ok\n");
         else{
 
             switch(new_Tile.north){
@@ -40,7 +104,7 @@ bool check_validity(struct Tile map[SIZE][SIZE],struct Tile new_Tile,short int x
                     printf("   ");
                     break;
             }
-            switch(map[x][y+1].south){
+            switch(map[x][y-1].south){
                 case city:
                     printf(" c ");
                     break;
@@ -148,8 +212,8 @@ bool check_validity(struct Tile map[SIZE][SIZE],struct Tile new_Tile,short int x
     }
 
     //check down
-    if((y-1)>=0){
-        if(map[x][y-1].north==new_Tile.south || map[x][y-1].north==empty)printf("down ok\n");
+    if((y+1)<SIZE){
+        if(map[x][y+1].north==new_Tile.south || map[x][y+1].north==empty)printf("down ok\n");
         else{
 
             switch(new_Tile.south){
@@ -166,7 +230,7 @@ bool check_validity(struct Tile map[SIZE][SIZE],struct Tile new_Tile,short int x
                     printf("   ");
                     break;
             }
-            switch(map[x][y-1].north){
+            switch(map[x][y+1].north){
                 case city:
                     printf(" c ");
                     break;
@@ -191,6 +255,7 @@ bool check_validity(struct Tile map[SIZE][SIZE],struct Tile new_Tile,short int x
 
     return return_value;
 }
+*/
 
 void fill_map_empty(struct Tile map[SIZE][SIZE]){
     int i,j;
@@ -206,8 +271,8 @@ void fill_map_empty(struct Tile map[SIZE][SIZE]){
 
 void print_map(struct Tile map[SIZE][SIZE]){
     int i,j;
-    for(i=0;i<SIZE;++i){
-        for(j=0;j<SIZE;++j){
+    for(i=1;i<(SIZE-1);++i){
+        for(j=1;j<(SIZE-1);++j){
             switch(map[i][j].north){
                 case city:
                     printf(" c ");
@@ -219,13 +284,13 @@ void print_map(struct Tile map[SIZE][SIZE]){
                     printf(" r ");
                     break;
                 case empty:
-                    printf("   ");
+                    printf(" - ");
                     break;
             }
         }
         printf("\n");
 
-        for(j=0;j<SIZE;++j){
+        for(j=1;j<(SIZE-1);++j){
             switch(map[i][j].west){
                 case city:
                     printf("c ");
@@ -237,7 +302,7 @@ void print_map(struct Tile map[SIZE][SIZE]){
                     printf("r ");
                     break;
                 case empty:
-                    printf("  ");
+                    printf("- ");
                     break;
             }
             switch(map[i][j].east){
@@ -251,13 +316,13 @@ void print_map(struct Tile map[SIZE][SIZE]){
                     printf("r");
                     break;
                 case empty:
-                    printf(" ");
+                    printf("-");
                     break;
             }
         }
         printf("\n");
 
-        for(j=0;j<SIZE;++j){
+        for(j=1;j<(SIZE-1);++j){
             switch(map[i][j].south){
                 case city:
                     printf(" c ");
@@ -269,13 +334,17 @@ void print_map(struct Tile map[SIZE][SIZE]){
                     printf(" r ");
                     break;
                 case empty:
-                    printf("   ");
+                    printf(" - ");
                     break;
             }
 
         }
-        printf("\n");
+        printf(" %d\n",i);
     }
+    for(i=1;i<(SIZE-1);i++){
+        printf(" %d ",i);
+    }
+    printf("\n");
 }
 
 void fill_templates(struct Tile templates[14]){
@@ -382,7 +451,7 @@ void fill_templates(struct Tile templates[14]){
 
 void get_input(short int in_commands[4]){
 
-    //tile x y r
+    //tile y x r
     scanf("%d %d %d %d",&in_commands[0],&in_commands[1],&in_commands[2],&in_commands[3]);
 }
 
@@ -430,7 +499,7 @@ bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14]){
     new_Tile = templates[in_commands[0]-1];
     rotate_Tile(&new_Tile,in_commands[3]);
 
-    /*
+
     switch(new_Tile.north){
                 case city:
                     printf(" c ");
@@ -494,16 +563,17 @@ bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14]){
             }
 
 
-    printf("\n\n----\n\n");
-    */
+    printf("\n\n----\n");
+
 
     //check validity
     if(check_validity(map,new_Tile,in_commands[1],in_commands[2])){
-        printf("valid\n");
+        printf("valid\n\n");
         map[in_commands[1]][in_commands[2]]=new_Tile;
     }
     else{
-        printf("INVALID!\n");
+        map[in_commands[1]][in_commands[2]]=new_Tile;
+        printf("INVALID!\n\n");
     }
 
     //process
@@ -518,7 +588,6 @@ bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14]){
 }
 
 
-
 int main()
 {
     struct Tile templates[14];
@@ -528,9 +597,9 @@ int main()
     fill_map_empty(&map);
     fill_templates(&templates);
 
-    //print_map(map);
+    print_map(map);
 
-    for(int i=0;i<9;i++){
+    for(int i=0;i<20;i++){
         Loop(&map,templates);
     }
 
