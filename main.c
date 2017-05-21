@@ -2,283 +2,108 @@
 #include <stdlib.h>
 #include <windows.h>
 
+#include "output.h"
+#include "input.h"
+#include "Tile.h"
+#include "movemechanics.h"
+
 typedef char bool;
 #define true 1;
 #define false 0;
 
-#define SIZE 5
 
-enum Content {city,road,plane,empty};
+#define SIZE 7
 
-typedef struct Tile{
-    enum Content north;
-    enum Content east;
-    enum Content south;
-    enum Content west;
-    bool isTemplePresent;
-}Tile;
+/*
+Split into files:
+-Input -bb
+-Output -done
+-Move checking -done
+-manual
+-auto
+*/
 
-bool check_validity(struct Tile map[SIZE][SIZE],struct Tile new_Tile,short int x, short int y){
+/*
+"Blueprint" for all tiles that will follow the pattern. I'm using enums to avoid having something unexpected
+show up in sides (north,east...) fields.
 
-    bool return_value = true;
-    //check up
-    if((y+1)<SIZE){
-        if(map[x][y+1].south==new_Tile.north || map[x][y+1].south==empty) printf("up ok\n");
-        else{
+*/
 
-            switch(new_Tile.north){
-                case city:
-                    printf(" c ");
-                    break;
-                case plane:
-                    printf(" p ");
-                    break;
-                case road:
-                    printf(" r ");
-                    break;
-                case empty:
-                    printf("   ");
-                    break;
+/*
+bool check_validity(struct Tile map[SIZE][SIZE],struct Tile new_Tile,short int y, short int x){ //re-written
+    //checking up
+    if(y>0){//checking if the tile up even exists to avoid reaching outside of the array
+            if(map[y-1][x].south==new_Tile.north || map[y-1][x].south==empty){ //check if sides match or next tile is empty
+
             }
-            switch(map[x][y+1].south){
-                case city:
-                    printf(" c ");
-                    break;
-                case plane:
-                    printf(" p ");
-                    break;
-                case road:
-                    printf(" r ");
-                    break;
-                case empty:
-                    printf("   ");
-                    break;
+            else{//sides dont match, move is not valid
+                return false;
             }
+    }
+    else{//tile up is outside the map. I probably gonna change it so it uses all the space map has to offer.
 
             return false;
-        }
-    }
-    else{
-        printf("Border issue...");
-        return false;
     }
 
     //check right
-    if((x+1)<SIZE){
-        if(map[x+1][y].west==new_Tile.east || map[x+1][y].west==empty)printf("right ok\n");
+    if((x+1)<SIZE){//Works in the same way as code above.
+        if(map[y][x+1].west==new_Tile.east || map[y][x+1].west==empty){
+
+        }
         else{
-
-            switch(new_Tile.east){
-                case city:
-                    printf(" c ");
-                    break;
-                case plane:
-                    printf(" p ");
-                    break;
-                case road:
-                    printf(" r ");
-                    break;
-                case empty:
-                    printf("   ");
-                    break;
-            }
-            switch(map[x+1][y].west){
-                case city:
-                    printf(" c ");
-                    break;
-                case plane:
-                    printf(" p ");
-                    break;
-                case road:
-                    printf(" r ");
-                    break;
-                case empty:
-                    printf("   ");
-                    break;
-            }
-
             return false;
         }
     }
     else{
-        printf("Border issue...");
-        return false;
+
+         return false;
     }
 
     //check left
-    if((x-1)>=0){
-        if(map[x-1][y].east==new_Tile.west || map[x-1][y].east==empty)printf("left ok\n");
+    if(x>0){
+        if(map[y][x-1].east==new_Tile.west || map[y][x-1].east==empty){
+
+        }
         else{
-
-            switch(new_Tile.west){
-                case city:
-                    printf(" c ");
-                    break;
-                case plane:
-                    printf(" p ");
-                    break;
-                case road:
-                    printf(" r ");
-                    break;
-                case empty:
-                    printf("   ");
-                    break;
-            }
-            switch(map[x-1][y].east){
-                case city:
-                    printf(" c ");
-                    break;
-                case plane:
-                    printf(" p ");
-                    break;
-                case road:
-                    printf(" r ");
-                    break;
-                case empty:
-                    printf("   ");
-                    break;
-            }
-
             return false;
         }
     }
     else{
-        printf("Border issue...");
-        return false;
+
+            return false;
     }
 
     //check down
-    if((y-1)>=0){
-        if(map[x][y-1].north==new_Tile.south || map[x][y-1].north==empty)printf("down ok\n");
-        else{
+    if((y+1)<SIZE){
+            if(map[y+1][x].north==new_Tile.south || map[y+1][x].north==empty){
 
-            switch(new_Tile.south){
-                case city:
-                    printf(" c ");
-                    break;
-                case plane:
-                    printf(" p ");
-                    break;
-                case road:
-                    printf(" r ");
-                    break;
-                case empty:
-                    printf("   ");
-                    break;
             }
-            switch(map[x][y-1].north){
-                case city:
-                    printf(" c ");
-                    break;
-                case plane:
-                    printf(" p ");
-                    break;
-                case road:
-                    printf(" r ");
-                    break;
-                case empty:
-                    printf("   ");
-                    break;
+            else{
+                return false;
             }
-
-            return false;
-        }
     }
     else{
-        printf("Border issue...");
+
         return false;
     }
-
-    return return_value;
+    return true;
 }
+*/
 
 void fill_map_empty(struct Tile map[SIZE][SIZE]){
     int i,j;
-    for(i=0;i<SIZE;++i){
+    for(i=0;i<SIZE;++i){//fills all tiles with "empty" to avoid any surprizes
         for(j=0;j<SIZE;++j){
             map[i][j].north = empty;
             map[i][j].east = empty;
             map[i][j].south = empty;
             map[i][j].west = empty;
+            map[i][j].isTemplePresent=false;
         }
     }
 }
 
-void print_map(struct Tile map[SIZE][SIZE]){
-    int i,j;
-    for(i=0;i<SIZE;++i){
-        for(j=0;j<SIZE;++j){
-            switch(map[i][j].north){
-                case city:
-                    printf(" c ");
-                    break;
-                case plane:
-                    printf(" p ");
-                    break;
-                case road:
-                    printf(" r ");
-                    break;
-                case empty:
-                    printf("   ");
-                    break;
-            }
-        }
-        printf("\n");
-
-        for(j=0;j<SIZE;++j){
-            switch(map[i][j].west){
-                case city:
-                    printf("c ");
-                    break;
-                case plane:
-                    printf("p ");
-                    break;
-                case road:
-                    printf("r ");
-                    break;
-                case empty:
-                    printf("  ");
-                    break;
-            }
-            switch(map[i][j].east){
-                case city:
-                    printf("c");
-                    break;
-                case plane:
-                    printf("p");
-                    break;
-                case road:
-                    printf("r");
-                    break;
-                case empty:
-                    printf(" ");
-                    break;
-            }
-        }
-        printf("\n");
-
-        for(j=0;j<SIZE;++j){
-            switch(map[i][j].south){
-                case city:
-                    printf(" c ");
-                    break;
-                case plane:
-                    printf(" p ");
-                    break;
-                case road:
-                    printf(" r ");
-                    break;
-                case empty:
-                    printf("   ");
-                    break;
-            }
-
-        }
-        printf("\n");
-    }
-}
-
-void fill_templates(struct Tile templates[14]){
+void fill_templates(struct Tile templates[14]){//change to reading from lib
     //nesw
     //1
     templates[0].north=plane;
@@ -380,57 +205,21 @@ void fill_templates(struct Tile templates[14]){
 
 }
 
-void get_input(short int in_commands[4]){
-
-    //tile x y r
-    scanf("%d %d %d %d",&in_commands[0],&in_commands[1],&in_commands[2],&in_commands[3]);
-}
-
-void rotate_Tile(struct Tile *new_Tile,short int rotation){
-    enum Content tmp;
-    switch(rotation){
-    case 1:
-        tmp = new_Tile->north;
-        new_Tile->north=new_Tile->west;
-        new_Tile->west=new_Tile->south;
-        new_Tile->south=new_Tile->east;
-        new_Tile->east=tmp;
-        break;
-
-    case 2:
-        tmp = new_Tile->north;
-        new_Tile->north=new_Tile->south;
-        new_Tile->south=tmp;
-        tmp=new_Tile->west;
-        new_Tile->west=new_Tile->east;
-        new_Tile->east=tmp;
-        break;
-
-    case 3:
-        tmp = new_Tile->north;
-        new_Tile->north=new_Tile->east;
-        new_Tile->east=new_Tile->south;
-        new_Tile->south=new_Tile->west;
-        new_Tile->west=tmp;
-
-    }
-}
-
-bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14]){
+bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14],short int quantities[14]){
 
     short int in_commands[4];
     struct Tile new_Tile;
 
 
     //take input
-    get_input(&in_commands);
+    //get_input_user(&in_commands);
+    read_from_console(&in_commands);
 
-    //printf("%d %d %d %d\n",in_commands[0],in_commands[1],in_commands[2],in_commands[3]);
-
+    //roatate tile
     new_Tile = templates[in_commands[0]-1];
     rotate_Tile(&new_Tile,in_commands[3]);
 
-    /*
+    //print roatated tile
     switch(new_Tile.north){
                 case city:
                     printf(" c ");
@@ -494,18 +283,22 @@ bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14]){
             }
 
 
-    printf("\n\n----\n\n");
-    */
+    printf("\n\n----\n");
+
 
     //check validity
-    if(check_validity(map,new_Tile,in_commands[1],in_commands[2])){
-        printf("valid\n");
-        map[in_commands[1]][in_commands[2]]=new_Tile;
+    if(quantities[in_commands[0]-1]>0){//check if tiles are aviable
+        if(check_validity(SIZE,SIZE,map,new_Tile,in_commands[1],in_commands[2])){
+            printf("valid\n\n");
+            map[in_commands[1]][in_commands[2]]=new_Tile;
+        }
+        else{
+            printf("INVALID!\n\n");
+        }
     }
     else{
-        printf("INVALID!\n");
+        printf("no tiles avaliable!\n");
     }
-
     //process
 
 
@@ -513,14 +306,18 @@ bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14]){
     //system("CLS");
 
     //display
-    print_map(map);
+    //print_map(map);
+    print_to_screen(SIZE,SIZE,map);
+    print_to_file(0,SIZE, SIZE, map);
 
+
+    return true;
 }
-
 
 
 int main()
 {
+    short int quantities[14]={5,5,5,5,5,5,5,5,5,5,5,5,5,5};
     struct Tile templates[14];
     struct Tile map[SIZE][SIZE];
     struct Tile new_Tile;
@@ -528,49 +325,13 @@ int main()
     fill_map_empty(&map);
     fill_templates(&templates);
 
+
     //print_map(map);
 
-    for(int i=0;i<9;i++){
-        Loop(&map,templates);
+    for(int i=0;i<20;i++){
+        Loop(&map,templates,&quantities);
     }
 
-
-
-    /*
-    map[2][2].north = city;
-    map[2][2].east = road;
-    map[2][2].south = plane;
-    map[2][2].west = road;
-    //map[y][x];
-    new_Tile.north = plane;
-    new_Tile.east = road;
-    new_Tile.south = plane;
-    new_Tile.west = road;
-
-
-
-    if(check_validity(&map,new_Tile,3,2)){
-        printf("valid\n");
-        map[2][3]=new_Tile;
-        print_map(map);
-    }
-    else{
-        printf("INVALID!\n");
-    }
-
-    rotate_Tile(&new_Tile,1);
-
-
-
-    if(check_validity(&map,new_Tile,3,2)){
-        printf("valid\n");
-        map[2][3]=new_Tile;
-        print_map(map);
-    }
-    else{
-        printf("INVALID!\n");
-    }
-    */
 
 
     return 0;
