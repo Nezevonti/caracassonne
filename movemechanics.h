@@ -7,12 +7,8 @@ void rotate_Tile(struct Tile *new_Tile,short int rotation);
 
 bool check_validity(int width,int height, struct Tile map[height][width],struct Tile new_Tile, short int y, short int x);
 
-bool check_up();
+int empty_sides(int width,int height, struct Tile map[height][width],short int y, short int x);
 
-bool check_right();
-
-bool check_down();
-
-bool check_left();
+int count_tiles_left(short int quantities[14]);
 
 #endif // MOVEMECHANICS_H_INCLUDED

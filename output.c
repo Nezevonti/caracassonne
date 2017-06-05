@@ -1,6 +1,6 @@
 
 #include "output.h"
-#include <stdio.h>
+
 //change those to to start from 0
 void print_to_screen(int width, int height, struct Tile map[height][width]){
     int i,j;
@@ -82,7 +82,7 @@ void print_to_screen(int width, int height, struct Tile map[height][width]){
     printf("\n");
 }
 
-void print_to_file(int score, int width, int height, struct Tile map[height][width]){
+void print_to_file(int score, int width, int height, struct Tile map[height][width],char file_name[]){
     /*
      c
     c c
@@ -91,7 +91,7 @@ void print_to_file(int score, int width, int height, struct Tile map[height][wid
     int i,j;
     FILE *fd = NULL;
 
-    fd=fopen("output.txt","w+");
+    fd=fopen(file_name,"w+");
     if(fd == NULL){
         printf("Encountured and error while opening the file...\n");
         return 0;

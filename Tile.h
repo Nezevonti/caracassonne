@@ -13,6 +13,12 @@ typedef struct Tile{
     enum Content south;
     enum Content west;
     bool isTemplePresent;
+    bool isEmpty;
 }Tile;
+
+typedef struct Coordinates{
+    int row;
+    int collumn;
+}Coordinates;
 
 #endif // TILE_H_INCLUDED

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <time.h>
 
 #include "output.h"
 #include "input.h"
@@ -12,7 +13,7 @@ typedef char bool;
 #define false 0;
 
 
-#define SIZE 7
+#define SIZE 17
 
 /*
 Split into files:
@@ -29,66 +30,13 @@ show up in sides (north,east...) fields.
 
 */
 
-/*
-bool check_validity(struct Tile map[SIZE][SIZE],struct Tile new_Tile,short int y, short int x){ //re-written
-    //checking up
-    if(y>0){//checking if the tile up even exists to avoid reaching outside of the array
-            if(map[y-1][x].south==new_Tile.north || map[y-1][x].south==empty){ //check if sides match or next tile is empty
 
-            }
-            else{//sides dont match, move is not valid
-                return false;
-            }
-    }
-    else{//tile up is outside the map. I probably gonna change it so it uses all the space map has to offer.
 
-            return false;
-    }
-
-    //check right
-    if((x+1)<SIZE){//Works in the same way as code above.
-        if(map[y][x+1].west==new_Tile.east || map[y][x+1].west==empty){
-
-        }
-        else{
-            return false;
-        }
-    }
-    else{
-
-         return false;
-    }
-
-    //check left
-    if(x>0){
-        if(map[y][x-1].east==new_Tile.west || map[y][x-1].east==empty){
-
-        }
-        else{
-            return false;
-        }
-    }
-    else{
-
-            return false;
-    }
-
-    //check down
-    if((y+1)<SIZE){
-            if(map[y+1][x].north==new_Tile.south || map[y+1][x].north==empty){
-
-            }
-            else{
-                return false;
-            }
-    }
-    else{
-
-        return false;
-    }
-    return true;
+int rand_coordinate(int max,int moves){
+    int seed = time(NULL);
+    srand(seed);
+    return rand() %max + 0;
 }
-*/
 
 void fill_map_empty(struct Tile map[SIZE][SIZE]){
     int i,j;
@@ -99,11 +47,13 @@ void fill_map_empty(struct Tile map[SIZE][SIZE]){
             map[i][j].south = empty;
             map[i][j].west = empty;
             map[i][j].isTemplePresent=false;
+            map[i][j].isEmpty=true;
         }
     }
 }
 
 void fill_templates(struct Tile templates[14]){//change to reading from lib
+
     //nesw
     //1
     templates[0].north=plane;
@@ -204,8 +154,8 @@ void fill_templates(struct Tile templates[14]){//change to reading from lib
     templates[13].isTemplePresent=false;
 
 }
-
-bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14],short int quantities[14]){
+/*
+bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14],short int quantities[14],int *moves){
 
     short int in_commands[4];
     struct Tile new_Tile;
@@ -213,7 +163,26 @@ bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14],short int quanti
 
     //take input
     //get_input_user(&in_commands);
+
     read_from_console(&in_commands);
+    /*
+    in_commands[0] = rand_coordinate(14,moves);
+    in_commands[0]++;
+    do{
+        in_commands[1] = rand_coordinate(SIZE,moves);
+        in_commands[2] = rand_coordinate(SIZE,moves+in_commands[1]);
+        in_commands[3] = rand_coordinate(3,moves);
+        new_Tile = templates[in_commands[0]-1];
+        rotate_Tile(&new_Tile,in_commands[3]);
+
+        if(*moves==0){
+            break;
+            printf("moves = 0\n");
+        }
+        printf("%d %d %d %d\n",in_commands[0],in_commands[1],in_commands[2],in_commands[3]);
+    }
+    while(!check_validity(SIZE,SIZE,map,new_Tile,in_commands[1],in_commands[2]));
+
 
     //roatate tile
     new_Tile = templates[in_commands[0]-1];
@@ -284,23 +253,41 @@ bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14],short int quanti
 
 
     printf("\n\n----\n");
-
-
+    //printf("%d %d %d %d\n",in_commands[0],in_commands[1],in_commands[2],in_commands[3]);
+    char c;
+    if(map[in_commands[1]][in_commands[2]].isEmpty==1){
+        c='T';
+    }
+    else{
+        c='F';
+    }
+    printf("%c ",c);
+    printf("%d",*moves);
     //check validity
     if(quantities[in_commands[0]-1]>0){//check if tiles are aviable
         if(check_validity(SIZE,SIZE,map,new_Tile,in_commands[1],in_commands[2])){
             printf("valid\n\n");
             map[in_commands[1]][in_commands[2]]=new_Tile;
+            map[in_commands[1]][in_commands[2]].isEmpty=false;
+            --quantities[in_commands[0]-1];
         }
         else{
-            printf("INVALID!\n\n");
+            if(*moves==0){
+                printf("valid\n\n");
+                map[in_commands[1]][in_commands[2]]=new_Tile;
+                map[in_commands[1]][in_commands[2]].isEmpty=false;
+                --quantities[in_commands[0]-1];
+            }
+            else{
+                printf("INVALID!\n\n");
+            }
         }
     }
     else{
         printf("no tiles avaliable!\n");
     }
     //process
-
+    ++*moves;
 
     //clear screen
     //system("CLS");
@@ -310,29 +297,150 @@ bool Loop(struct Tile map[SIZE][SIZE],struct Tile templates[14],short int quanti
     print_to_screen(SIZE,SIZE,map);
     print_to_file(0,SIZE, SIZE, map);
 
-
     return true;
 }
 
+*/
 
-int main()
+int main(int argc,char *argv[])
 {
-    short int quantities[14]={5,5,5,5,5,5,5,5,5,5,5,5,5,5};
+    //0 0 3 0 5 1 1 7 2 0 3 2 1 6
+    short int quantities[14]={0,0,3,0,5,1,1,7,2,0,3,2,1,5};
     struct Tile templates[14];
     struct Tile map[SIZE][SIZE];
     struct Tile new_Tile;
+    int moves = 0;
+    bool test = true;
+    int i;
+
+    //if(argc!=)
+
+    read_library(&templates,argv[3]);
+    read_tiles(&quantities,argv[2]);
 
     fill_map_empty(&map);
-    fill_templates(&templates);
 
+    //printf("%d",argc);
+
+    if(strcmp(argv[1],"a")==0){
+        loop_auto(SIZE,SIZE,&map,&quantities,templates,argv[4]);//go auto
+    }
+    else{
+        loop_manual(SIZE,SIZE,&map,&quantities,templates,argv[4]);//go manual
+    }
+    //print_to_file(0,SIZE,SIZE,map,argv[4]);
+
+    //for(i=1;i<argc;++i){
+        //printf("%s\n",argv[i]);
+    //}
 
     //print_map(map);
+    //print_to_screen(SIZE,SIZE,map);
 
-    for(int i=0;i<20;i++){
-        Loop(&map,templates,&quantities);
+    /*
+    for(i=0;test==1;i++){
+        if(count_tiles_left(quantities)==0){
+            test = 0;
+            break;
+        }
+        Loop(&map,templates,&quantities,&moves);
+    }
+    */
+
+
+
+
+    /*
+    printf("\n");
+    for(i=0;i<14;++i){
+        printf("%d ",quantities[i]);
+    }
+    printf("\n");
+
+    */
+
+
+    /*
+    for(i=0;i<14;++i){
+        new_Tile=templates[i];
+        switch(new_Tile.north){
+            case city:
+                printf(" c ");
+                break;
+            case plane:
+                printf(" p ");
+                break;
+            case road:
+                printf(" r ");
+                break;
+            case empty:
+                printf("   ");
+                break;
+        }
+        printf("\n");
+
+    switch(new_Tile.west){
+        case city:
+            printf("c ");
+            break;
+        case plane:
+            printf("p ");
+            break;
+        case road:
+            printf("r ");
+            break;
+        case empty:
+            printf("  ");
+            break;
+        }
+    switch(new_Tile.east){
+        case city:
+            printf("c");
+            break;
+        case plane:
+            printf("p");
+            break;
+        case road:
+            printf("r");
+            break;
+        case empty:
+            printf(" ");
+            break;
+        }
+        printf("\n");
+
+
+    switch(new_Tile.south){
+        case city:
+            printf(" c ");
+            break;
+        case plane:
+            printf(" p ");
+            break;
+        case road:
+            printf(" r ");
+            break;
+        case empty:
+            printf("   ");
+            break;
+        }
+    printf("\n%d\n",new_Tile.isTemplePresent);
+    }
+    */
+
+    /*
+    srand(time(NULL));
+    int rand_tmp=rand()%99999+0;
+
+    for(i=0;i<100;i++){
+        //srand(time(NULL));
+        printf("%d\n",rand_tmp%14);
+
+        srand(rand_tmp);
+        rand_tmp=rand()%99999+0;
+
     }
 
-
-
+    */
     return 0;
 }
